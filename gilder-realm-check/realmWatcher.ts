@@ -2,7 +2,7 @@ import * as web3 from "@solana/web3.js";
 import { getRealm,getAllProposals } from "@solana/spl-governance";
 import { RPC_CONNECTION } from "../common/constants/Solana";
 import { db } from '../common/database/db_init'
-import BN = require("bn.js")
+import BN from 'bn.js';
 import axios from 'axios';
 
 // Get most recent proposal

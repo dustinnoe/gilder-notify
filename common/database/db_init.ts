@@ -27,4 +27,3 @@ db.prepare(
     'pubkey_subscribe TEXT NOT NULL, ' + 
     'name TEXT NOT NULL)'
 ).run();
-

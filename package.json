@@ -10,9 +10,11 @@
     "start-watcher": "supervisor ts-node ./gilder-realm-check/realmWatcher.ts"
   },
   "dependencies": {
+    "@project-serum/borsh": "^0.2.5",
     "@solana/spl-governance": "^0.0.34",
     "@solana/web3.js": "^1.39.1",
     "axios": "^0.27.1",
-    "better-sqlite3": "^7.5.1"
+    "better-sqlite3": "^7.5.1",
+    "ws": "^8.5.0"
   }
 }

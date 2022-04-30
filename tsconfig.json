@@ -102,6 +102,9 @@
     "./node_modules"
   ],
   "include": [
+    "./api",
+    "./gilder-realm-check",
+    "./gilder-realm-listen",
     "./package.json"
   ]
 }

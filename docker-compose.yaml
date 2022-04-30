@@ -1,9 +1,9 @@
-version: "3.8"
+version: "3"
 
 services:
   gilder-check:
     image: node:16-buster
-    command: bash -c "node --version && npm install && npm install -g supervisor && supervisor ./gilder-realm-check/realmWatcher.js"
+    command: bash -c "npm install && npm install -g supervisor && supervisor ./gilder-realm-check/realmWatcher.js"
     working_dir: /gilder-notify
     volumes: 
       - ./dist:/gilder-notify

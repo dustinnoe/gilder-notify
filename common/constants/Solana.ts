@@ -13,6 +13,7 @@ export const SPL_PUBLIC_KEY = new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss
 */
 
 export const RPC_CONNECTION = "https://ssc-dao.genesysgo.net/";
+export const PUBSUB_CONNECTION = "wss://ssc-dao.genesysgo.net/";
 export const API_CONNECTION = "http://localhost:3000/api/";
 
 // backup in case genesysgo has issues
