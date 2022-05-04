@@ -7,7 +7,11 @@ export class NotifyMeController {
 
     @Post()
     notifyMe(@Body() body: any): any {
-        console.log(body)
         return this.notifyMeService.notifyMe(body);
+    }
+
+    @Post('listSubscriptions')
+    getDeviceSubscriptions(@Body() body: any): any {
+        return this.notifyMeService.getDeviceSubscriptions(body);
     }
 }

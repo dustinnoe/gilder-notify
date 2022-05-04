@@ -40,11 +40,17 @@ export class NotifyMeService{
             mobileToken: body.mobileToken,
             deviceType: 'iOS',
             isActive: true,
-            subscriptionType: 'newProposals',
-            pubkeySubscribe: body.pubkeySubscribe
+            type: 'newProposals',
+            realm: body.realm
         })
 
         this.notificationSubscriptionsRepository.save(newNotificationSubscription);
-        return 'hi';
+      }
+
+      getDeviceSubscriptions(body: any): any {
+        return this.notificationSubscriptionsRepository.find({
+            select: ["type", "realm"],
+            where: { mobileToken: body.mobileToken }
+        });
       }
 }

@@ -3,20 +3,22 @@ import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
 @Entity()
 export class NotificationSubscription {
     @PrimaryGeneratedColumn()
-    id: number;
+    id!: number;
 
-    @Column()
-    mobileToken: string;
+    @Column("text")
+    mobileToken!: string;
 
-    @Column()
-    deviceType: string;
+    @Column("text")
+    deviceType!: string;
 
-    @Column()
-    subscriptionType: string;
+    @Column("text")
+    type!: string;
 
-    @Column()
-    pubkeySubscribe: string;
+    @Column("text")
+    realm!: string;
 
-    @Column()
-    isActive: boolean;
+    @Column({
+        default: true
+    })
+    isActive!: boolean;
 }

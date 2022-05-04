@@ -1,10 +1,17 @@
 version: "3"
 
 services:
-  gilder-check:
+  gilder-notify-api:
     image: node:16-buster
-    command: bash -c "npm install && npm install -g supervisor && supervisor ./gilder-realm-check/realmWatcher.js"
+    command: bash -c "npm install && npm install sqlite3 && npm start"
     working_dir: /gilder-notify
     volumes: 
-      - ./dist:/gilder-notify
-      - ./:/var/gilder
+      - ./dist/api:/gilder-notify
+    ports:
+      - "3000:3000"
+  gilder-listen:
+    image: node:16-buster
+    command: bash -c "npm install && npm install -g supervisor && supervisor ./gilder-realm-listen/realmListener.js"
+    working_dir: /gilder-notify
+    volumes: 
+      - ./dist/listen:/gilder-notify

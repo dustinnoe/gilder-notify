@@ -3,14 +3,14 @@ import { Entity, PrimaryGeneratedColumn, Column, Timestamp } from "typeorm";
 @Entity()
 export class Realm {
     @PrimaryGeneratedColumn()
-    id: number;
+    id!: number;
 
-    @Column()
-    pubkey: string;
+    @Column("text")
+    pubkey!: string;
 
-    @Column()
-    owner: string;
+    @Column("text")
+    owner!: string;
 
-    @Column()
-    name: string;
+    @Column("text")
+    name!: string;
 }
