@@ -1,11 +1,17 @@
 version: "3"
 
 services:
-  gilder-notify:
+  gilder-notify-api:
     image: node:16-buster
-    command: bash -c "npm install && npm install -g typescript ts-node supervisor && tsc -p ./tsconfig.json && $(supervisor ./dist/gilder-realm-listen/realmListener.js &) && cd api && npm install && nest start"
+    command: bash -c "npm install -g typescript ts-node supervisor && cd api && npm install && npm run build && npm run start:prod"
     working_dir: /gilder-notify
     volumes: 
       - ./:/gilder-notify
     ports:
       - "3000:3000"
+  gilder-notify-listener:
+    image: node:16-buster
+    command: bash -c "npm install -g typescript ts-node supervisor && npm install && tsc && supervisor ./dist/gilder-realm-listen/realmListener.js"
+    working_dir: /gilder-notify
+    volumes: 
+      - ./:/gilder-notify
