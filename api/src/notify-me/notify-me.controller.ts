@@ -6,8 +6,8 @@ export class NotifyMeController {
     constructor(private notifyMeService: NotifyMeService) {}
 
     @Post()
-    notifyMe(@Body() body: any): any {
-        return this.notifyMeService.notifyMe(body);
+    async notifyMe(@Body() body: any): Promise<any> {
+        return await this.notifyMeService.notifyMe(body);
     }
 
     @Post('listSubscriptions')

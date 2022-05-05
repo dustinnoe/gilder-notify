@@ -1,11 +1,22 @@
 import { Injectable, Res, HttpStatus, Body } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+
+import { getRealms } from '@solana/spl-governance';
+import { Connection, PublicKey } from '@solana/web3.js';
+import { throws } from "assert";
+
 import { NotificationSubscription } from "src/notificationSubscription.entity";
+import { Realm } from "src/realms.entity";
 import { Repository } from "typeorm";
+
+
 
 @Injectable({})
 export class NotifyMeService{
-    constructor(@InjectRepository(NotificationSubscription) private notificationSubscriptionsRepository: Repository<NotificationSubscription>){
+    constructor(
+        @InjectRepository(NotificationSubscription) private notificationSubscriptionsRepository: Repository<NotificationSubscription>,
+        @InjectRepository(Realm) private realmsRepository: Repository<Realm>
+    ){
 
     }
 
@@ -17,25 +28,33 @@ export class NotifyMeService{
         return this.notificationSubscriptionsRepository.findOneOrFail(id) // SELECT * FROM notificationSubscriptions WHERE id = ?;
     }
 
-    notifyMe(body: any): any {
+    async notifyMe(body: any): Promise<any> {
         // Validate input
-        // if(
-        //     body.subscriptionType != "newProposals" ||
-        //     !body.mobileToken.match(/^[0-9A-Za-z\[\]]*$/) ||
-        //     !body.pubkeySubscribe.match(/^[1-9A-HJ-MP-Za-km-z]{44}$/)
-        // ){
-        //     res.status(HttpStatus.BAD_REQUEST).send();
-        //     return;
-        // }
-        // db.prepare(
-        //   "INSERT INTO notification_subscription (device_token, subscription_type, pubkey_subscribe) VALUES (?, ?, ?)"
-        // ).run(
-        //   body.mobileToken,
-        //   body.subscriptionType,
-        //   body.pubkeySubscribe
-        // )
-        // console.log(body.method)
         console.log(body)
+        if(
+            body.type != "newProposals" ||
+            !body.mobileToken.match(/^[0-9A-Za-z\[\]]*$/) ||
+            !body.realm.match(/^[1-9A-HJ-NP-Za-km-z]{44}$/)
+        ){
+            return 'Bad Request';
+        }
+
+        // Check if subscription already exists
+        let existing = await this.notificationSubscriptionsRepository.findOne({
+            where: {type: "newProposals", mobileToken: body.mobileToken, realm: body.realm}
+        })
+        if(existing) return 'Already subscribed.';
+        
+        // Check if realm is already tracked and add to realm table if not
+        let realmTracked = await this.realmsRepository.findOne({
+            where: { pubkey: body.realm }
+        })
+        if(!realmTracked){
+            this.realmsRepository.save({
+                pubkey: body.realm
+            })
+        }
+        
         const newNotificationSubscription = this.notificationSubscriptionsRepository.create({
             mobileToken: body.mobileToken,
             deviceType: 'iOS',
@@ -44,7 +63,7 @@ export class NotifyMeService{
             realm: body.realm
         })
 
-        this.notificationSubscriptionsRepository.save(newNotificationSubscription);
+        return await this.notificationSubscriptionsRepository.save(newNotificationSubscription);
       }
 
       getDeviceSubscriptions(body: any): any {

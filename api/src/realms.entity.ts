@@ -8,9 +8,15 @@ export class Realm {
     @Column("text")
     pubkey!: string;
 
-    @Column("text")
+    @Column({
+        type: "text",
+        nullable: true
+    })
     owner!: string;
 
-    @Column("text")
+    @Column({
+        type: "text",
+        nullable: true
+    })
     name!: string;
 }
