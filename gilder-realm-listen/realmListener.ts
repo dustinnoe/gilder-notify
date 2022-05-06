@@ -33,7 +33,6 @@ async function getNotifySubscriptions(type: string, realmPk: string){
 
 async function notifyNewProposals(realmPk: string, realmName: string, proposalName: string, proposalPk: string){
     let subs = await getNotifySubscriptions("newProposals", realmPk);
-    console.log(subs)
     subs.forEach((s: any) => {
         axios.post( "https://api.expo.dev/v2/push/send", {
             to: s.mobileToken,
@@ -55,7 +54,6 @@ async function notifyNewProposals(realmPk: string, realmName: string, proposalNa
 
 async function updateLastProposalForRealm(realmPk: web3.PublicKey, proposalDetails: any){
     let zero: BN = new BN(0);
-    console.log(proposalDetails);
     if(proposalDetails == undefined)
         proposalDetails = {
             name: '',
@@ -84,7 +82,6 @@ async function getLastStoredProposalDraftAtTime(realmPk: string){
         where: { realmPubkey: realmPk},
         order: { draftAt: 'DESC'}
     });
-    console.log(row);
     if(!row) return 0;
     return row.draftAt;
 }
@@ -125,9 +122,7 @@ function startRealmListener(realm: Realm){
 }
 
 async function run(){
-    console.log(realmsRepository)
     let realms: any = await realmsRepository.find();
-    console.log(realms);
     realms.forEach((r: Realm) => { startRealmListener(r) });
 }
 
@@ -160,9 +155,7 @@ async function initNewRealms(){
     })
   }
 
-// Check for new realms every 30 seconds
+// Check for new realms every 60 seconds
 setInterval(()=>{
-    console.log(connection["_accountChangeSubscriptions"])
-    console.log('Checking for new realms...')
     initNewRealms();
-}, 30000)
+}, 60000)
