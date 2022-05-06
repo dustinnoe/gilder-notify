@@ -4,9 +4,9 @@ import BN from 'bn.js';
 
 import * as web3 from "@solana/web3.js";
 import { RPC_CONNECTION } from "../common/constants/Solana";
-import { getAllProposals } from "@solana/spl-governance";
+import { getAllProposals, getRealm } from "@solana/spl-governance";
 
-import { DataSource } from "typeorm";
+import { DataSource, IsNull } from "typeorm";
 import { NotificationSubscription } from '../api/src/notificationSubscription.entity';
 import { Realm } from '../api/src/realms.entity';
 import { NotifyProposal } from '../api/src/proposals.entity';
@@ -125,6 +125,7 @@ function startRealmListener(realm: Realm){
 }
 
 async function run(){
+    console.log(realmsRepository)
     let realms: any = await realmsRepository.find();
     console.log(realms);
     realms.forEach((r: Realm) => { startRealmListener(r) });
@@ -135,3 +136,33 @@ AppDataSource.initialize()
     run();
 })
 .catch((error) => console.log(error));
+
+// Checks the database for any new realms that were subscribed to but
+// are not yet being listened to for notifications.If one is found
+// update the database and start a listener
+async function initNewRealms(){
+    let realms: any = await realmsRepository.find({
+      where: { owner: IsNull(), name: IsNull() }
+    });
+    realms.forEach(async (r: any) => {
+      console.log("Found new realm: " + r.pubkey);
+      let realm: any;
+      try{
+        realm = await getRealm(connection, new web3.PublicKey(r.pubkey));
+      } catch(err) {
+        console.log(err);
+        return;
+      }
+      r.owner = realm.owner.toBase58();
+      r.name = realm.account.name;
+      await realmsRepository.save(r);
+      startRealmListener(r);
+    })
+  }
+
+// Check for new realms every 30 seconds
+setInterval(()=>{
+    console.log(connection["_accountChangeSubscriptions"])
+    console.log('Checking for new realms...')
+    initNewRealms();
+}, 30000)
