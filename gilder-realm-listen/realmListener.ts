@@ -137,23 +137,28 @@ AppDataSource.initialize()
 // update the database and start a listener
 async function initNewRealms(){
     let realms: any = await realmsRepository.find({
-      where: { owner: IsNull(), name: IsNull() }
+        where: { owner: IsNull(), name: IsNull() }
     });
     realms.forEach(async (r: any) => {
-      console.log("Found new realm: " + r.pubkey);
-      let realm: any;
-      try{
-        realm = await getRealm(connection, new web3.PublicKey(r.pubkey));
-      } catch(err) {
-        console.log(err);
-        return;
-      }
-      r.owner = realm.owner.toBase58();
-      r.name = realm.account.name;
-      await realmsRepository.save(r);
-      startRealmListener(r);
+        console.log("Found new realm: " + r.pubkey);
+        let realm: any;
+        try{
+            realm = await getRealm(connection, new web3.PublicKey(r.pubkey));
+        } catch(err) {
+            console.log(err);
+            return;
+        }
+        try{
+            await getNewerProposals(connection, new web3.PublicKey(realm.pubkey), new web3.PublicKey(realm.owner), true)
+        } catch(err){
+            console.log(err);
+        }
+        r.owner = realm.owner.toBase58();
+        r.name = realm.account.name;
+        await realmsRepository.save(r);
+        startRealmListener(r);
     })
-  }
+}
 
 // Check for new realms every 60 seconds
 setInterval(()=>{
