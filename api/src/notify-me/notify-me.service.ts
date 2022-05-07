@@ -29,12 +29,13 @@ export class NotifyMeService{
     }
 
     async notifyMe(body: any): Promise<any> {
+        if(body.unsubscribe == undefined) body.unsubscribe = false;
         // Validate input
-        console.log(body)
         if(
             body.type != "newProposals" ||
             !body.mobileToken.match(/^[0-9A-Za-z\[\]]*$/) ||
-            !body.realm.match(/^[1-9A-HJ-NP-Za-km-z]{44}$/)
+            !body.realm.match(/^[1-9A-HJ-NP-Za-km-z]{32,44}$/) ||
+            typeof body.unsubscribe != 'boolean'
         ){
             return 'Bad Request';
         }
@@ -43,6 +44,18 @@ export class NotifyMeService{
         let existing = await this.notificationSubscriptionsRepository.findOne({
             where: {type: "newProposals", mobileToken: body.mobileToken, realm: body.realm}
         })
+
+        if(existing && body.unsubscribe){
+            try {
+                await this.notificationSubscriptionsRepository.remove(existing);
+                return 'Unsubscribed';
+            }
+            catch(err){
+                console.log(err);
+                return 'Unsubscribe request failed'
+            }
+        }
+
         if(existing) return 'Already subscribed.';
         
         // Check if realm is already tracked and add to realm table if not
