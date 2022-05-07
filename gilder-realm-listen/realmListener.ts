@@ -37,6 +37,7 @@ async function notifyNewProposals(realmPk: string, realmName: string, proposalNa
         axios.post( "https://api.expo.dev/v2/push/send", {
             to: s.mobileToken,
             title: "New proposal on " + realmName,
+            sound: "default",
             body: proposalName,
             data: {
                 realmId: realmPk,
@@ -66,12 +67,11 @@ async function updateLastProposalForRealm(realmPk: web3.PublicKey, proposalDetai
         order: { draftAt: 'DESC' }
     });
     if(last) await npRepository.remove(last);
-
     let newProposal = npRepository.create({
         realmPubkey: realmPk.toBase58(),
         name: proposalDetails.name,
         descriptionLink: proposalDetails.descriptionLink,
-        label: proposalDetails.options.label,
+        label: '',
         draftAt: proposalDetails.draftAt.toNumber()
     });
     await npRepository.save(newProposal);
